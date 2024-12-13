@@ -35,9 +35,18 @@ const login = async (userData) => {
         throw new Error(401)
     }
 
-    const token =  generateAccessToken({username:userData.email});
+    const token =  generateAccessToken({email:userData.email, id: user.rows[0].id});
 
     return token;
 }
 
-module.exports = { createUser, login };
+const getUserById = async(id) => {
+    let user = await userRepository.findUserById(id)
+    console.log(user)
+    if(!user){
+        throw new Error("User not found")
+    }
+    return user
+}
+
+module.exports = { createUser, login, getUserById };

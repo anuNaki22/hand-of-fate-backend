@@ -27,4 +27,13 @@ const createUser = async (user) => {
   }
 };
 
-module.exports = { createUser, findUserByEmail };
+const findUserById = async(id) => {
+    try {
+        const result = await pool.query("SELECT *FROM users where id = $1", [id])
+        return result.rows[0]
+    } catch (error){
+        throw new Error("Something went wrong")    
+    }
+}
+
+module.exports = { createUser, findUserByEmail, findUserById };

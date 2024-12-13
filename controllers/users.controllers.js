@@ -1,5 +1,6 @@
 const Joi = require('joi')
-const userService = require("../services/users.services")
+const userService = require("../services/users.services");
+const { UserResponse } = require('../dto/userResponse');
 
 //Joi untuk memvalidasi data berdasarkan input user
 const registerSchema = Joi.object({
@@ -10,6 +11,21 @@ const registerSchema = Joi.object({
     balance: Joi.number().required(),
     fullname: Joi.string().required(),
   });
+
+  //memproses request dan response
+  const createUser = async (req, res) => {
+    try {
+      const { error, value } = registerSchema.validate(req.body);
+  
+      if (error) {
+        return res.status(400).json({ error: error.message });
+      }
+      const user = await userService.createUser(value);
+      res.status(200).json({ data: user });
+    } catch (error) {
+      res.status(error.statusCode || 500).json({ error: error.message });
+    }
+  };
 
 const loginSchema = Joi.object({
     email: Joi.string().email().required(),
@@ -36,21 +52,18 @@ const login = async (req, res) => {
     }
 }
 
-//memproses request dan response
-  const createUser = async (req, res) => {
-    try {
-      const { error, value } = registerSchema.validate(req.body);
-  
-      if (error) {
-        return res.status(400).json({ error: error.message });
-      }
-      const user = await userService.createUser(value);
-      res.status(200).json({ data: user });
-    } catch (error) {
-      res.status(error.statusCode || 500).json({ error: error.message });
+const getUserById = async(req, res) => {
+    try{
+        const{id} = req.user;
+        console.log(id)
+        const user = await userService.getUserById(Number(id))
+        res.status(200).json({data: new UserResponse(user)})
+    } 
+        catch(error){
+        res.status(error.statusCode || 500).json({error:error.message})
     }
-  };
-  
-  module.exports = { createUser, login };
+}
+
+  module.exports = { createUser, login, getUserById };
 
 
