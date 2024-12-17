@@ -10,7 +10,7 @@ router.get("/profile", authenticateToken, userController.getUserById);
 router.post("/login", userController.login);
 
 //transaction
-router.get("/transaction", userController.transaction);
+router.get("/transaction/:id", userController.getTransactionById);
 // router.get("/historytransaction". userController.historytransaction);
 
 module.exports = router;

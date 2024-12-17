@@ -1,6 +1,7 @@
 const Joi = require('joi')
 const userService = require("../services/users.services");
 const { UserResponse } = require('../dto/userResponse');
+const { UserTransaction } = require('../dto/userTransaction');
 
 //Joi untuk memvalidasi data berdasarkan input user
 const registerSchema = Joi.object({
@@ -26,6 +27,28 @@ const registerSchema = Joi.object({
       res.status(error.statusCode || 500).json({ error: error.message });
     }
   };
+
+const transactionSchema = Joi.object({
+    // id: Joi.string().email().required(),
+    dateTime: Joi.number().required(),
+    type: Joi.string().required(),
+    fromTo: Joi.string().optional(),
+    description: Joi.string().optional(),
+    amount: Joi.number().required(),
+    user_id: Joi.number().required(),
+  });
+
+  const getTransactionById = async(req, res) => {
+    try{
+        const{id} = req.user;
+        console.log(id)
+        const user = await userService.getTransactionById(Number(id))
+        res.status(200).json({data: new UserTransaction(transaction)})
+    } 
+        catch(error){
+        res.status(error.statusCode || 500).json({error:error.message})
+    }
+}
 
 const loginSchema = Joi.object({
     email: Joi.string().email().required(),
@@ -64,6 +87,6 @@ const getUserById = async(req, res) => {
     }
 }
 
-  module.exports = { createUser, login, getUserById };
+  module.exports = { createUser, login, getUserById, getTransactionById };
 
 
