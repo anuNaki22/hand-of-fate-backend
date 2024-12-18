@@ -8,9 +8,10 @@ const authenticateToken = require("../middlewares/auth.middleware");
 router.post("/users", userController.createUser);
 router.get("/profile", authenticateToken, userController.getUserById);
 router.post("/login", userController.login);
+// router.post("/transaction", userController.login);
 
 //transaction
-router.get("/transaction/:id", userController.getTransactionById);
+// router.get("/transaction/:id", userController.getTransactionById);
 // router.get("/historytransaction". userController.historytransaction);
 
 module.exports = router;

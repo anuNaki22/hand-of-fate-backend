@@ -1,12 +1,12 @@
 class UserTransaction {
     constructor(transaction) {
       this.id = transaction.id
-      this.dateTime = transaction.dateTime;
-      this.type = transaction.type;
-      this.fromTo = transaction.fromTo;
-      this.description = transaction.description;
+      this.walled_id = transaction.walled_id;
+      this.transaction_type = transaction.transaction_type;
       this.amount = transaction.amount;
-      this.user_id = transaction.user_id;
+      this.recipient_wallet_id = transaction.recipient_wallet_id;
+      this.transaction_date = transaction.transaction_date;
+      this.description = transaction.description;
     }
   }
 
