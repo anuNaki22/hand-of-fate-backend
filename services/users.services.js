@@ -51,7 +51,7 @@
 
 // module.exports = { createUser, login, getUserById };
 
-const bcrypt = require("bcrypt.js");
+const bcrypt = require("bcryptjs");
 const userRepository = require("../repositories/users.repositories");
 const { generateAccessToken } = require("../utils/auth.util");
 const {
