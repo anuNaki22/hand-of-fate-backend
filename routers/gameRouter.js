@@ -6,5 +6,5 @@ const router = express.Router();
 router.post('/start', gameController.startGame);
 router.post('/move', gameController.makeMove);
 
-module.exports = { router };
+module.exports = router;
  

@@ -5,4 +5,4 @@ const router = express.Router();
 
 router.post('/join', playerController.addPlayer);
 
-module.exports = { router };
+module.exports = router; 
