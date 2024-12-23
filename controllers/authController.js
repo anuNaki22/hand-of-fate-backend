@@ -1,57 +1,96 @@
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const { createUser, findUserByEmail } = require("../models/userModel");
-const Joi = require("joi");
+const supabase = require("../supabase"); // Import Supabase instance
+const Joi = require("joi"); // Untuk validasi
 
-// Validasi Register
+// Skema validasi
 const registerSchema = Joi.object({
-  fullName: Joi.string().min(3).max(50).required(),
   email: Joi.string().email().required(),
   password: Joi.string().min(6).required(),
+  username: Joi.string().min(3).max(50).required(),
 });
 
-// Validasi Login
 const loginSchema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().required(),
 });
 
+// Fungsi register
 const register = async (req, res) => {
-  const { fullName, email, password } = req.body;
+  const { email, password, username } = req.body;
 
-  const { error } = registerSchema.validate({ fullName, email, password });
+  // Validasi input
+  const { error } = registerSchema.validate(req.body);
   if (error) return res.status(400).json({ message: error.details[0].message });
 
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await createUser(fullName, email, hashedPassword);
-    res.status(201).json({ message: "User registered successfully", user });
+    const { user, error: authError } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    if (authError) {
+      return res.status(400).json({ message: authError.message });
+    }
+
+    const { data, error: profileError } = await supabase
+      .from("profiles")
+      .insert([{ id: user.id, username, email }]);
+      console.log('Profile Insert Result:', data);
+
+    if (profileError) {
+      console.error("Error inserting profile:", profileError);
+      throw profileError;
+    }
+
+    res.status(201).json({
+      message: "User registered successfully",
+      user: { id: user.id, email, username },
+    });
   } catch (error) {
-    res.status(500).json({ message: "Error registering user", error });
+    res
+      .status(500)
+      .json({ message: "Error registering user", error: error.message });
   }
 };
 
+// Fungsi login
 const login = async (req, res) => {
   const { email, password } = req.body;
 
-  const { error } = loginSchema.validate({ email, password });
+  // Validasi input
+  const { error } = loginSchema.validate(req.body);
   if (error) return res.status(400).json({ message: error.details[0].message });
 
   try {
-    const user = await findUserByEmail(email);
-    if (!user) return res.status(404).json({ message: "User not found" });
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
-      return res.status(401).json({ message: "Invalid credentials" });
-
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-      expiresIn: "1d",
+    const {
+      user,
+      session,
+      error: authError,
+    } = await supabase.auth.signInWithPassword({
+      email,
+      password,
     });
-    res.status(200).json({ message: "Login successful", token });
+
+    if (authError) {
+      return res.status(400).json({ message: authError.message });
+    }
+
+    const { data: userProfile, error: profileError } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+
+    if (profileError) {
+      console.error("Error fetching profile:", profileError);
+      throw profileError;
+    }
+
+    res.status(200).json({
+      message: "Login successful",
+      token: session.access_token, // Token untuk API
+      user: { id: user.id, email, username: userProfile.username }, // Data profil
+    });
   } catch (error) {
-    // Logging error details for debugging
-    console.error("Error during login:", error);
     res.status(500).json({ message: "Error logging in", error: error.message });
   }
 };

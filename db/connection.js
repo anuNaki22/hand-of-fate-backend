@@ -4,8 +4,8 @@ const pool = new Pool({
   // local
   user: "postgres",
   host: "localhost",
-  database: "hof_db",
-  password: "datalovers",
+  database: "db_hof",
+  password: "admin",
   port: 5432,
 
   // deployed
