@@ -10,6 +10,9 @@ const pool = new Pool({
 
   // deployed
   connectionString: process.env.DB_URL,
+  ssl: {
+    rejectUnauthorized: false, // Untuk Railway jika menggunakan SSL
+  },
 });
 
 module.exports = pool;
