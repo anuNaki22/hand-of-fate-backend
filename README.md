@@ -101,8 +101,6 @@ npm start
 ### Development Dependencies
 
 - **nodemon**: Auto-restart server during development.
-- **typescript**: TypeScript integration.
-- **@types/express** and **@types/node**: TypeScript definitions for Express and Node.js.
 
 ---
 
